@@ -10,6 +10,28 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+# Understanding Joins 
+# In order for joins to work on two tables, let us say x_table and y_table, there needs to be matching values on both sides for the shared key. For example: 
+
+# x_table: Restaurants                             y_table: Restaurant Orders
+# name                item                         customer                  item
+# Bars!               Fish and Chips               1                         French Fries
+# Fish Res.           Battered Rings               2                         Battered Rings
+# SeaSide             Grilled Salmon               3                         Grilled Salmon
+
+# If we do: 
+# fn: Restaurants %>% left_join(Restaurant Orders)
+
+# We find that the tables will join_by: item
+# Now together it looks like this 
+# Left Joined Table 
+# name                item                 customer            
+# Bars!               Fish and Chips       NA
+# Fish Res.           Battered Rings       2
+# SeaSide             Grilled Salmon       3
+
+# There is an NA value for Customer one, because French Fries was in y_table but not in x_table therefore there is no match! 
+
 # I. Left Join 
 # So far in my Github repository I've worked on regex, dplyr, plotly, and now will give deep attention to left_joins using the nycflights23 dataset and dplyr package for left_join!
 # Load the nycflights23 package and dplyr
