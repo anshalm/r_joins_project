@@ -367,7 +367,7 @@ car_brands_n %>%
 car_brands_n %>%
   left_join(car_parts, join_by(serial_numbers)) 
 
-# We can join by serial_numbers since the years of car being produced and car parts are different, they cannot overlap or NA values will overwrite the set!
+# We can join by serial_numbers since the years of car being produced and car parts are different, they cannot overlap or NA values will overwrite the set! The serial numbers of the car and car parts are same for the join_by to have worked! 
 # Thank you for coming to the end of this project! Just a rule of thumb: for the joins to work, the values in x match the values in y or NA values will show. That's all!
 ```
 
