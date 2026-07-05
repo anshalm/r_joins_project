@@ -1,0 +1,373 @@
+---
+title: "r_joins_project"
+author: "Anshal Majmudar"
+date: "2026-06-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# I. Left Join 
+# So far in my Github repository I've worked on regex, dplyr, plotly, and now will give deep attention to left_joins using the nycflights23 dataset and dplyr package for left_join!
+# Load the nycflights23 package and dplyr
+pacman::p_load(nycflights23,
+               dplyr)
+
+# A. Left_Joins by Flights dataset and Airlines dataset 
+flights_new = flights
+flights_new %>%
+  left_join(airlines) %>%
+  select(year, month, day, carrier, time_hour) # Since both datasets have: id = "carrier" we can join the two tables together by that id; similarly we can do it to any other dataset if it has matching id or ids!
+
+# B. Left_Joins by Flights dataset and Weather. What are the matching column ids?
+flights_new %>%
+  left_join(weather %>% select(origin, time_hour, temp, visib)) 
+
+# We decide to select inside the weather dataset so those values are matched exactly along with the flights_new dataset values
+
+# C. Join_By 
+# Let's say we wanted to join a dataset that had both years in it, but meant different things like nycflights::planes and flights_new - it would return many NA values because the x y rows matching are not returning the same values for years. Therefore join_by a convienient function can help join the x y rows together outputting the values we are wanting to match - in our case by 'tailnum'
+flights_new %>%
+  left_join(planes, join_by('tailnum')) # This is also called an equi-join (join_by(tailnum == tailnum))
+
+# We can also do this with 'dest == faa' and 'origin == faa', since they are essentially the same values with the airports dataset (they're all three letters airport codes)
+# 1. dest == faa
+flights_new %>%
+  left_join(airports, join_by(dest == faa))
+
+# 2. origin == faa
+flights_new %>%
+  left_join(airports, join_by(origin == faa))
+```
+
+```{r}
+# II. Let's try this with another dataset and try cleaning it too! 
+# We'll make our own datasets this time!
+car_brand = c("Toyota", 
+              "Mazda", 
+              "Lexus", 
+              "Mercedes", 
+              "BMW", 
+              "Volkswagen", 
+              "Tesla", 
+              "Polestar",
+              "Lucid", 
+              "Mitsibushi",
+              "Acura",
+              "Honda",
+              "Porsche",
+              "Nissan",
+              "Ford")
+mph = as.integer(c("45",
+        "60",
+        "35",
+        "70",
+        "40",
+        "55",
+        "90",
+        "25",
+        "10",
+        "20",
+        "95",
+        "100",
+        "125",
+        "130",
+        "210"))
+country = c("JA",
+            "SK",
+            "SI",
+            "GE",
+            "UK",
+            "TH",
+            "IN",
+            "AU",
+            "BE",
+            "PA",
+            "MX",
+            "PR",
+            "US",
+            "HU",
+            "NZ")
+serial_numbers = c("SX98099",
+                   "YZ89979",
+                   "UX67589",
+                   "OK99879",
+                   "PL09345",
+                   "ZZ04596",
+                   "YZ88779",
+                   "OX68769",
+                   "FK94579",
+                   "LL09985",
+                   "CX87655",
+                   "CF12356",
+                   "OS84526",
+                   "MO48571",
+                   "PW01237")
+car_make = c("Camry",
+             "MPV",
+             "LX 360",
+             "Wagon",
+             "Bonfire",
+             "Auto-Wagon",
+             "Model Y",
+             "3",
+             "L45",
+             "M95",
+             "RX 350",
+             "Pilot",
+             "Cayenne",
+             "Dimas",
+             "Boomer")
+year_produced = as.integer(c("2011", 
+                   "2011", 
+                   "2011",
+                   "2011",
+                   "2011", 
+                   "2011", 
+                   "2011", 
+                   "2011",
+                   "2011",
+                   "2011", 
+                   "2011", 
+                   "2011", 
+                   "2011",
+                   "2011",
+                   "2011")) 
+color = c("Yellow",
+          "Blue",
+          "Orange",
+          "Rose",
+          "Teal",
+          "Green",
+          "Black",
+          "Violet",
+          "Maroon",
+          "White",
+          "Navy",
+          "Indigo",
+          "Red",
+          "Burgundy",
+          "Cobalt")
+
+# We'll make our first dataset based on the car brand, car make, mph, what country it is from, year it was produced, serial numbers, and color
+car_brands = tibble(car_brand, car_make, mph, country, year_produced, serial_numbers, color)
+car_brands
+```
+
+```{r}
+# We'll make our second dataset based on the cars' companies (we're making up the fact they're owned by a parent company), ceos, country of origin, awards, mergers
+companies = c("Vierdan",
+              "Bonswar",
+              "Undries",
+              "French Federalis",
+              "Gunties",
+              "Weder",
+              "Kilmind",
+              "Derivied",
+              "Infiries",
+              "Treedom",
+              "Serifieas",
+              "Molusks",
+              "Werdies",
+              "Oxfordius",
+              "Sundries")
+ceos = c("Sophie Stewart",
+         "Jo Palmer",
+         "Jakob Miller",
+         "Hennie Elliot",
+         "Justeen Gonzales",
+         "Fernando Palmer",
+         "Bertha Butler",
+         "Martin Chapman",
+         "Esteban Wallace",
+         "Fernanda Murray",
+         "Bob Martin",
+         "Sebastia Marshall",
+         "Maximus Kelly",
+         "Alvin Shaw",
+         "Nigella Armstrong")
+country = c("JA",
+            "SK",
+            "SI",
+            "GE",
+            "UK",
+            "TH",
+            "IN",
+            "AU",
+            "BE",
+            "PA",
+            "MX",
+            "PR",
+            "US",
+            "HU",
+            "NZ")
+awards = c("Award of Car",
+           "Car of the Century",
+           "Future Car Innovator Award",
+           "Future Car Award",
+           "Innovator of the Year",
+           "Company of the Year",
+           "Highest Honors",
+           "Highest Achievement",
+           "Achievement in Car Physics",
+           "Fastest Car",
+           "Best Car for Young Adults",
+           "Flying Car Concept Winner",
+           "Flying Car Innovator",
+           "Hydraulic Based Car Winner",
+           "Underwater Best Car")
+mergers = c("Merger with: Underwater Labs",
+            "Merger with: TheScience Labs",
+            "Merger with: Future Labs",
+            "Merger with: FireScience Labs",
+            "Merger with: Earth Labs",
+            "Merger with: Car Labs",
+            "Merger with: CarPhysics Labs",
+            "Merger with: Phys Labs",
+            "Merger with: Yurn Labs",
+            "Merger with: GreenSea Labs",
+            "Merger with: Ice Labs",
+            "Merger with: Tre Labs",
+            "Merger with: MileMPH Labs",
+            "Merger with: Mach1 Labs",
+            "Merger with: Eve Labs")
+car_companies = tibble(companies, ceos, country, awards, mergers)
+car_companies
+```
+
+
+```{r}
+# We will make our third dataset based on car parts. This will include the car part names, year they were produced, serial numbers, name of the facility producing them, description, wear or tear rating, parts denied list of 15
+part_names = c("Engine",
+               "Transmission",
+               "Oil Stick",
+               "Water Filter",
+               "Windshield Wiper",
+               "Side Mirror",
+               "Front Mirror",
+               "Battery",
+               "Exhaust Pipe",
+               "Sunroof",
+               "Trunk Door",
+               "Camera",
+               "Gear Stick",
+               "Screen",
+               "Tire")
+year_produced = as.integer(c("2003",
+                             "2007",
+                             "2008",
+                             "2009",
+                             "2001",
+                             "2010",
+                             "2004",
+                             "2005",
+                             "2002",
+                             "2006",
+                             "2000",
+                             "1997",
+                             "2011",
+                             "1998",
+                             "1995"))
+facility_names = c("Car Parts 30", 
+                   "Big Car Parts",
+                   "Parts for Cars",
+                   "Tires & Cars Products",
+                   "Car Products",
+                   "International Car Parts",
+                   "Flex Car Parts",
+                   "Body Shop Car Parts",
+                   "Online Car Parts Fac.",
+                   "Supersize Car Parts",
+                   "Ultra Car Parts",
+                   "Alien Car Parts",
+                   "Carware Parts",
+                   "Super Car Parts",
+                   "Mini Car Parts")
+description = c("This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description",
+                "This is a description")
+wear_or_tear_rating = c("4/10",
+                        "1/10",
+                        "5/10",
+                        "6/10",
+                        "9/10",
+                        "10/10",
+                        "2/10",
+                        "3/10",
+                        "7/10",
+                        "1/10",
+                        "2/10",
+                        "4/10",
+                        "3/10",
+                        "8/10",
+                        "10/10")
+parts_denied = c("Front Door (due to Dent)",
+                 "Side Mirror (broken)",
+                 "Back Tailight (missing glass)",
+                 "Back Bumper (slightly scuffed)",
+                 "License Plate Frame (angled wrong)",
+                 "Engine Cover (missing)",
+                 "Fuel Tank (has hole inside)",
+                 "Battery (corroded - needs replacing)",
+                 "Front Axle (wrong amount of holes)",
+                 "Tires All (came badly punctured)",
+                 "Blinker (faint light)",
+                 "AC Wiring (done reversely)",
+                 "Glove Compartment (broke immediately)",
+                 "Cup Holder (backwards placement)",
+                 "Seats (stained)")
+serial_numbers = c("SX98099",
+                   "YZ89979",
+                   "UX67589",
+                   "OK99879",
+                   "PL09345",
+                   "ZZ04596",
+                   "YZ88779",
+                   "OX68769",
+                   "FK94579",
+                   "LL09985",
+                   "CX87655",
+                   "CF12356",
+                   "OS84526",
+                   "MO48571",
+                   "PW01237")
+car_parts = tibble(part_names, serial_numbers, year_produced, description, facility_names, wear_or_tear_rating, parts_denied)
+car_parts
+```
+
+```{r}
+# Great! Now that we have all three datasets, we can do joins on them! 
+# A. Left Join
+car_brands_n = car_brands %>%
+  select(car_brand, car_make, mph, country, year_produced, serial_numbers)
+car_brands_n %>%
+  left_join(car_companies) # For our joins purposes, I made sure the countries the cars were made in and the countries the ceos were from are one and the same! That way the joins work perfectly and show no NA values!
+
+# Understanding: We are trying to match all values of x in y.
+# The countries are both in x_table, and y_table. 
+# As such the columns and values of: "companies", "ceos", "awards", and "mergers" of y_table are now joined as part of x_table. That's why those values show. If that was not the case and none of them matched, NA values would show up instead. 
+
+# B. Join_By
+# What if we wanted to join two datasets by the cars serial numbers? We can do that with car_brands_n and car_parts!
+car_brands_n %>%
+  left_join(car_parts, join_by(serial_numbers)) 
+
+# We can join by serial_numbers since the years of car being produced and car parts are different, they cannot overlap or NA values will overwrite the set!
+# Thank you for coming to the end of this project! Just a rule of thumb: for the joins to work, the values in x match the values in y or NA values will show. That's all!
+```
+
